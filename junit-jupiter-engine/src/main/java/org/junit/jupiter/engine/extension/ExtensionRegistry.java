@@ -79,6 +79,15 @@ public class ExtensionRegistry {
 		return registry;
 	}
 
+	public static ExtensionRegistry createRegistryFrom(ExtensionRegistry parentRegistry, Extension... extensions) {
+
+		Preconditions.notNull(parentRegistry, "parentRegistry must not be null");
+
+		ExtensionRegistry registry = new ExtensionRegistry(parentRegistry);
+		Arrays.stream(extensions).forEach(registry::registerExtension);
+		return registry;
+	}
+
 	private final ExtensionRegistry parent;
 
 	private final Set<Class<? extends Extension>> registeredExtensionTypes = new LinkedHashSet<>();
