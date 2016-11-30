@@ -17,13 +17,13 @@ import java.util.Iterator;
 import org.junit.platform.commons.meta.API;
 
 /**
- * {@code TestInvocationProvider} defines the API for {@link Extension Extensions}
- * that wish to provide information for the invocation of tests.
+ * {@code TestInvocationContextProvider} defines the API for
+ * {@link Extension Extensions} that wish to provide one or multiple information for the invocation of tests.
  *
  * @since 5.0
  */
 @API(Experimental)
-public interface TestInvocationProvider extends Extension {
+public interface TestInvocationContextProvider extends Extension {
 
 	Iterator<TestInvocationContext> provideInvocation(ContainerExtensionContext extensionContext);
 

@@ -10,6 +10,8 @@
 
 package org.junit.jupiter.engine.descriptor;
 
+import java.util.Optional;
+
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -24,9 +26,9 @@ class TestInvocationTestDescriptor extends AbstractTestDescriptor {
 
 	static final String TEST_INVOCATION_SEGMENT_TYPE = "test-invocation";
 
-	TestInvocationTestDescriptor(UniqueId uniqueId, String displayName, TestSource source) {
+	TestInvocationTestDescriptor(UniqueId uniqueId, String displayName, Optional<TestSource> source) {
 		super(uniqueId, displayName);
-		setSource(source);
+		source.ifPresent(this::setSource);
 	}
 
 	@Override

@@ -64,6 +64,10 @@ public class JupiterEngineExecutionContext implements EngineExecutionContext {
 		return this.state.throwableCollector;
 	}
 
+	public TestMethodExecutionStrategy getTestMethodExecutionStrategy() {
+		return this.state.testMethodExecutionStrategy;
+	}
+
 	public void beforeAllMethodsExecuted(boolean beforeAllMethodsExecuted) {
 		this.beforeAllMethodsExecuted = beforeAllMethodsExecuted;
 	}
@@ -84,6 +88,7 @@ public class JupiterEngineExecutionContext implements EngineExecutionContext {
 		ExtensionRegistry extensionRegistry;
 		ExtensionContext extensionContext;
 		ThrowableCollector throwableCollector;
+		TestMethodExecutionStrategy testMethodExecutionStrategy;
 
 		State(EngineExecutionListener executionListener, ConfigurationParameters configurationParameters) {
 			this.executionListener = executionListener;
@@ -128,6 +133,11 @@ public class JupiterEngineExecutionContext implements EngineExecutionContext {
 
 		public Builder withThrowableCollector(ThrowableCollector throwableCollector) {
 			newState().throwableCollector = throwableCollector;
+			return this;
+		}
+
+		public Builder withTestMethodExecutionStrategy(TestMethodExecutionStrategy testMethodExecutionStrategy) {
+			newState().testMethodExecutionStrategy = testMethodExecutionStrategy;
 			return this;
 		}
 

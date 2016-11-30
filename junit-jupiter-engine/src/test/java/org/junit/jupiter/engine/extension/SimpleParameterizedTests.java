@@ -28,7 +28,7 @@ import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.api.extension.ContainerExtensionContext;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.TestInvocationContext;
-import org.junit.jupiter.api.extension.TestInvocationProvider;
+import org.junit.jupiter.api.extension.TestInvocationContextProvider;
 import org.junit.platform.commons.JUnitException;
 
 public class SimpleParameterizedTests {
@@ -41,7 +41,7 @@ public class SimpleParameterizedTests {
 		}
 	}
 
-	static class SimpleParameterizedExtension implements TestInvocationProvider {
+	static class SimpleParameterizedExtension implements TestInvocationContextProvider {
 		@Override
 		public Iterator<TestInvocationContext> provideInvocation(ContainerExtensionContext extensionContext) {
 			if (extensionContext.getTestMethod().isPresent()) {
