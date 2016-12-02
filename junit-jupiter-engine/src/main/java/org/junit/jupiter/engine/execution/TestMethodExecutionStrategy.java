@@ -10,14 +10,12 @@
 
 package org.junit.jupiter.engine.execution;
 
-import java.util.function.Consumer;
-
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 
 public interface TestMethodExecutionStrategy {
 
 	ConditionEvaluationResult evaluateConditions(JupiterEngineExecutionContext context);
 
-	void execute(JupiterEngineExecutionContext context, Consumer<JupiterEngineExecutionContext> executor);
+	void execute(JupiterEngineExecutionContext context);
 
 }

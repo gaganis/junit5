@@ -14,7 +14,6 @@ import static org.junit.jupiter.engine.descriptor.TestInvocationTestDescriptor.T
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ContainerExtensionContext;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestExtensionContext;
 import org.junit.jupiter.api.extension.TestInvocationContext;
 import org.junit.jupiter.api.extension.TestInvocationContextProvider;
+import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.jupiter.engine.execution.ConditionEvaluator;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.jupiter.engine.execution.TestMethodExecutionStrategy;
@@ -44,9 +44,12 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
 	private static final SingleTestExecutor singleTestExecutor = new SingleTestExecutor();
 
 	private final AbstractTestDescriptor containerTestDescriptor;
+	private final SingleInvocationExecutionStrategy singleInvocationExecutionStrategy;
 
-	MultiInvocationExecutionStrategy(AbstractTestDescriptor testDescriptor) {
+	MultiInvocationExecutionStrategy(AbstractTestDescriptor testDescriptor,
+			ThrowingConsumer<JupiterEngineExecutionContext> testMethodCaller) {
 		this.containerTestDescriptor = testDescriptor;
+		this.singleInvocationExecutionStrategy = new SingleInvocationExecutionStrategy(testMethodCaller);
 	}
 
 	@Override
@@ -56,7 +59,7 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
 	}
 
 	@Override
-	public void execute(JupiterEngineExecutionContext context, Consumer<JupiterEngineExecutionContext> executor) {
+	public void execute(JupiterEngineExecutionContext context) {
 		AtomicInteger index = new AtomicInteger(0);
 		List<TestInvocationContextProvider> testInvocationContextProviders = context.getExtensionRegistry().getExtensions(
 			TestInvocationContextProvider.class);
@@ -64,18 +67,17 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
         testInvocationContextProviders.stream()
                 .map(provider -> provider.provideInvocation((ContainerExtensionContext) context.getExtensionContext()))
                 .forEach(iterator -> iterator.forEachRemaining(invocationContext -> {
-                    processTestInvocation(context, invocationContext, index.getAndIncrement(), executor);
+                    processTestInvocation(context, invocationContext, index.getAndIncrement());
                 }));
         // @formatter:on
 	}
 
 	private void processTestInvocation(JupiterEngineExecutionContext parentContext,
-			TestInvocationContext invocationContext, int index, Consumer<JupiterEngineExecutionContext> executor) {
-		TestInvocationTestDescriptor testDescriptor = buildInvocationTestDescriptor(parentContext, invocationContext,
-			index);
+			TestInvocationContext invocationContext, int index) {
+		TestInvocationTestDescriptor testDescriptor = buildInvocationTestDescriptor(invocationContext, index);
 		JupiterEngineExecutionContext executionContext = buildInvocationExecutionContext(testDescriptor, parentContext,
 			invocationContext);
-		skipOrExecute(testDescriptor, executionContext, executor);
+		skipOrExecute(testDescriptor, executionContext);
 	}
 
 	private JupiterEngineExecutionContext buildInvocationExecutionContext(TestInvocationTestDescriptor testDescriptor,
@@ -96,8 +98,8 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
         // @formatter:on
 	}
 
-	private TestInvocationTestDescriptor buildInvocationTestDescriptor(JupiterEngineExecutionContext parentContext,
-			TestInvocationContext invocationContext, int index) {
+	private TestInvocationTestDescriptor buildInvocationTestDescriptor(TestInvocationContext invocationContext,
+			int index) {
 		UniqueId uniqueId = containerTestDescriptor.getUniqueId().append(TEST_INVOCATION_SEGMENT_TYPE, "#" + index);
 		String displayName = invocationContext.getDisplayName();
 		TestInvocationTestDescriptor testDescriptor = new TestInvocationTestDescriptor(uniqueId, displayName,
@@ -106,8 +108,7 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
 		return testDescriptor;
 	}
 
-	private void skipOrExecute(TestDescriptor descriptor, JupiterEngineExecutionContext context,
-			Consumer<JupiterEngineExecutionContext> executor) {
+	private void skipOrExecute(TestDescriptor descriptor, JupiterEngineExecutionContext context) {
 		EngineExecutionListener listener = context.getExecutionListener();
 		listener.dynamicTestRegistered(descriptor);
 
@@ -120,7 +121,8 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
 		}
 		else {
 			listener.executionStarted(descriptor);
-			TestExecutionResult result = singleTestExecutor.executeSafely(() -> executor.accept(context));
+			TestExecutionResult result = singleTestExecutor.executeSafely(
+				() -> singleInvocationExecutionStrategy.execute(context));
 			listener.executionFinished(descriptor, result);
 		}
 	}
