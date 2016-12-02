@@ -27,18 +27,18 @@ import org.junit.jupiter.engine.execution.AfterEachMethodAdapter;
 import org.junit.jupiter.engine.execution.BeforeEachMethodAdapter;
 import org.junit.jupiter.engine.execution.ConditionEvaluator;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
-import org.junit.jupiter.engine.execution.TestMethodExecutionStrategy;
+import org.junit.jupiter.engine.execution.TestInvocationStrategy;
 import org.junit.jupiter.engine.execution.ThrowableCollector;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.util.ExceptionUtils;
 
-class SingleInvocationExecutionStrategy implements TestMethodExecutionStrategy {
+class SingleTestInvocationStrategy implements TestInvocationStrategy {
 
 	private static final ConditionEvaluator conditionEvaluator = new ConditionEvaluator();
 
 	private final ThrowingConsumer<JupiterEngineExecutionContext> testMethodCaller;
 
-	SingleInvocationExecutionStrategy(ThrowingConsumer<JupiterEngineExecutionContext> testMethodCaller) {
+	SingleTestInvocationStrategy(ThrowingConsumer<JupiterEngineExecutionContext> testMethodCaller) {
 		this.testMethodCaller = testMethodCaller;
 	}
 

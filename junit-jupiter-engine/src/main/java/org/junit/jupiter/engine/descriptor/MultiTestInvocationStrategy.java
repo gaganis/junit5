@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.TestInvocationContextProvider;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.jupiter.engine.execution.ConditionEvaluator;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
-import org.junit.jupiter.engine.execution.TestMethodExecutionStrategy;
+import org.junit.jupiter.engine.execution.TestInvocationStrategy;
 import org.junit.jupiter.engine.execution.ThrowableCollector;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.util.ExceptionUtils;
@@ -38,18 +38,18 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.hierarchical.SingleTestExecutor;
 
-public class MultiInvocationExecutionStrategy implements TestMethodExecutionStrategy {
+class MultiTestInvocationStrategy implements TestInvocationStrategy {
 
 	private static final ConditionEvaluator conditionEvaluator = new ConditionEvaluator();
 	private static final SingleTestExecutor singleTestExecutor = new SingleTestExecutor();
 
 	private final AbstractTestDescriptor containerTestDescriptor;
-	private final SingleInvocationExecutionStrategy singleInvocationExecutionStrategy;
+	private final SingleTestInvocationStrategy singleTestInvocationStrategy;
 
-	MultiInvocationExecutionStrategy(AbstractTestDescriptor testDescriptor,
+	MultiTestInvocationStrategy(AbstractTestDescriptor testDescriptor,
 			ThrowingConsumer<JupiterEngineExecutionContext> testMethodCaller) {
 		this.containerTestDescriptor = testDescriptor;
-		this.singleInvocationExecutionStrategy = new SingleInvocationExecutionStrategy(testMethodCaller);
+		this.singleTestInvocationStrategy = new SingleTestInvocationStrategy(testMethodCaller);
 	}
 
 	@Override
@@ -74,13 +74,13 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
 
 	private void processTestInvocation(JupiterEngineExecutionContext parentContext,
 			TestInvocationContext invocationContext, int index) {
-		TestInvocationTestDescriptor testDescriptor = buildInvocationTestDescriptor(invocationContext, index);
-		JupiterEngineExecutionContext executionContext = buildInvocationExecutionContext(testDescriptor, parentContext,
+		TestInvocationTestDescriptor testDescriptor = buildTestDescriptor(invocationContext, index);
+		JupiterEngineExecutionContext executionContext = buildExecutionContext(testDescriptor, parentContext,
 			invocationContext);
 		skipOrExecute(testDescriptor, executionContext);
 	}
 
-	private JupiterEngineExecutionContext buildInvocationExecutionContext(TestInvocationTestDescriptor testDescriptor,
+	private JupiterEngineExecutionContext buildExecutionContext(TestInvocationTestDescriptor testDescriptor,
 			JupiterEngineExecutionContext parentContext, TestInvocationContext invocationContext) {
 		Object testInstance = getTestInstance(parentContext);
 		ThrowableCollector throwableCollector = new ThrowableCollector();
@@ -98,8 +98,7 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
         // @formatter:on
 	}
 
-	private TestInvocationTestDescriptor buildInvocationTestDescriptor(TestInvocationContext invocationContext,
-			int index) {
+	private TestInvocationTestDescriptor buildTestDescriptor(TestInvocationContext invocationContext, int index) {
 		UniqueId uniqueId = containerTestDescriptor.getUniqueId().append(TEST_INVOCATION_SEGMENT_TYPE, "#" + index);
 		String displayName = invocationContext.getDisplayName();
 		TestInvocationTestDescriptor testDescriptor = new TestInvocationTestDescriptor(uniqueId, displayName,
@@ -122,7 +121,7 @@ public class MultiInvocationExecutionStrategy implements TestMethodExecutionStra
 		else {
 			listener.executionStarted(descriptor);
 			TestExecutionResult result = singleTestExecutor.executeSafely(
-				() -> singleInvocationExecutionStrategy.execute(context));
+				() -> singleTestInvocationStrategy.execute(context));
 			listener.executionFinished(descriptor, result);
 		}
 	}

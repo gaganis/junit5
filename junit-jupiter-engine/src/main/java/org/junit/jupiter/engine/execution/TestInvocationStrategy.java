@@ -12,7 +12,7 @@ package org.junit.jupiter.engine.execution;
 
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 
-public interface TestMethodExecutionStrategy {
+public interface TestInvocationStrategy {
 
 	ConditionEvaluationResult evaluateConditions(JupiterEngineExecutionContext context);
 

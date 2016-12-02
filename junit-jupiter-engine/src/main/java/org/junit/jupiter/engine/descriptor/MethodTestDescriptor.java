@@ -21,7 +21,7 @@ import org.junit.jupiter.api.extension.TestExtensionContext;
 import org.junit.jupiter.api.extension.TestInvocationContextProvider;
 import org.junit.jupiter.engine.execution.ExecutableInvoker;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
-import org.junit.jupiter.engine.execution.TestMethodExecutionStrategy;
+import org.junit.jupiter.engine.execution.TestInvocationStrategy;
 import org.junit.jupiter.engine.execution.ThrowableCollector;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.meta.API;
@@ -119,23 +119,24 @@ public class MethodTestDescriptor extends JupiterTestDescriptor {
 					.withExtensionRegistry(registry)
 					.withExtensionContext(testExtensionContext)
 					.withThrowableCollector(throwableCollector)
-					.withTestMethodExecutionStrategy(new SingleInvocationExecutionStrategy(this::invokeTestMethod))
+					.withTestInvocationStrategy(new SingleTestInvocationStrategy(this::invokeTestMethod))
 					.build();
 			// @formatter:on
 		}
+		MethodBasedContainerExtensionContext containerExtensionContext = new MethodBasedContainerExtensionContext(
+			context.getExtensionContext(), context.getExecutionListener(), this);
 		// @formatter:off
-		MethodBasedContainerExtensionContext containerExtensionContext = new MethodBasedContainerExtensionContext(context.getExtensionContext(), context.getExecutionListener(), this);
 		return context.extend()
 				.withExtensionRegistry(registry)
 				.withExtensionContext(containerExtensionContext)
-				.withTestMethodExecutionStrategy(new MultiInvocationExecutionStrategy(this, this::invokeTestMethod))
+				.withTestInvocationStrategy(new MultiTestInvocationStrategy(this, this::invokeTestMethod))
 				.build();
 		// @formatter:on
 	}
 
 	@Override
 	public SkipResult shouldBeSkipped(JupiterEngineExecutionContext context) throws Exception {
-		TestMethodExecutionStrategy executionStrategy = context.getTestMethodExecutionStrategy();
+		TestInvocationStrategy executionStrategy = context.getTestMethodExecutionStrategy();
 		ConditionEvaluationResult evaluationResult = executionStrategy.evaluateConditions(context);
 		if (evaluationResult.isDisabled()) {
 			return SkipResult.skip(evaluationResult.getReason().orElse("<unknown>"));
