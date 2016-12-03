@@ -66,7 +66,7 @@ public class SimpleParameterizedTests {
 		}
 
 		@Override
-		public Iterator<TestInvocationContext> provideInvocationContexts(ContainerExtensionContext extensionContext) {
+		public Iterator<TestInvocationContext> provide(ContainerExtensionContext extensionContext) {
 			Map<Parameter, String[]> values = new LinkedHashMap<>();
 			Parameter[] parameters = extensionContext.getTestMethod().orElseThrow(
 				IllegalStateException::new).getParameters();

@@ -30,7 +30,7 @@ public interface TestInvocationContextProvider extends Extension {
 
 	boolean supports(ContainerExtensionContext extensionContext);
 
-	Iterator<TestInvocationContext> provideInvocationContexts(ContainerExtensionContext extensionContext);
+	Iterator<TestInvocationContext> provide(ContainerExtensionContext extensionContext);
 
 	interface TestInvocationContext {
 

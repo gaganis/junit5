@@ -10,6 +10,9 @@
 
 package org.junit.jupiter.engine.descriptor;
 
+import static java.util.Spliterator.ORDERED;
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.StreamSupport.stream;
 import static org.junit.jupiter.engine.descriptor.TestInvocationTestDescriptor.TEST_INVOCATION_SEGMENT_TYPE;
 
 import java.util.List;
@@ -60,12 +63,12 @@ class MultiTestInvocationStrategy implements TestInvocationStrategy {
 	@Override
 	public void execute(JupiterEngineExecutionContext context) {
 		AtomicInteger index = new AtomicInteger(0);
+		ContainerExtensionContext contextExtensionContext = (ContainerExtensionContext) context.getExtensionContext();
 		// @formatter:off
         testInvocationContextProviders.stream()
-                .map(provider -> provider.provideInvocationContexts((ContainerExtensionContext) context.getExtensionContext()))
-                .forEach(iterator -> iterator.forEachRemaining(invocationContext -> {
-                    processTestInvocation(context, invocationContext, index.getAndIncrement());
-                }));
+                .map(provider -> provider.provide(contextExtensionContext))
+				.flatMap(iterator -> stream(spliteratorUnknownSize(iterator, ORDERED), false))
+                .forEach(invocationContext -> processTestInvocation(context, invocationContext, index.getAndIncrement()));
         // @formatter:on
 	}
 
