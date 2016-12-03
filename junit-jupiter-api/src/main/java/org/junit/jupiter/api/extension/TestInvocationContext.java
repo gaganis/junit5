@@ -13,13 +13,16 @@ package org.junit.jupiter.api.extension;
 import static org.junit.platform.commons.meta.API.Usage.Experimental;
 
 import java.lang.reflect.Parameter;
+import java.text.MessageFormat;
 
 import org.junit.platform.commons.meta.API;
 
 @API(Experimental)
 public interface TestInvocationContext {
 
-	String getDisplayName();
+	default String getDisplayName(ContainerExtensionContext extensionContext, int index) {
+		return MessageFormat.format("{0}[{1}]", extensionContext.getDisplayName(), index);
+	}
 
 	boolean hasValue(Parameter parameter);
 

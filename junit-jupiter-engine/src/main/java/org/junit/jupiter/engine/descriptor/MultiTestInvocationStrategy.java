@@ -74,7 +74,7 @@ class MultiTestInvocationStrategy implements TestInvocationStrategy {
 
 	private void processTestInvocation(JupiterEngineExecutionContext parentContext,
 			TestInvocationContext invocationContext, int index) {
-		TestInvocationTestDescriptor testDescriptor = buildTestDescriptor(invocationContext, index);
+		TestInvocationTestDescriptor testDescriptor = buildTestDescriptor(parentContext, invocationContext, index);
 		JupiterEngineExecutionContext executionContext = buildExecutionContext(testDescriptor, parentContext,
 			invocationContext);
 		skipOrExecute(testDescriptor, executionContext);
@@ -98,9 +98,11 @@ class MultiTestInvocationStrategy implements TestInvocationStrategy {
         // @formatter:on
 	}
 
-	private TestInvocationTestDescriptor buildTestDescriptor(TestInvocationContext invocationContext, int index) {
+	private TestInvocationTestDescriptor buildTestDescriptor(JupiterEngineExecutionContext parentContext,
+			TestInvocationContext invocationContext, int index) {
 		UniqueId uniqueId = containerTestDescriptor.getUniqueId().append(TEST_INVOCATION_SEGMENT_TYPE, "#" + index);
-		String displayName = invocationContext.getDisplayName();
+		String displayName = invocationContext.getDisplayName(
+			(ContainerExtensionContext) parentContext.getExtensionContext(), index);
 		TestInvocationTestDescriptor testDescriptor = new TestInvocationTestDescriptor(uniqueId, displayName,
 			containerTestDescriptor.getSource());
 		containerTestDescriptor.addChild(testDescriptor);

@@ -76,7 +76,7 @@ public class SimpleParameterizedTests {
 						int index = current++;
 						return new TestInvocationContext() {
 							@Override
-							public String getDisplayName() {
+							public String getDisplayName(ContainerExtensionContext extensionContext, int index) {
 								return values.entrySet().stream().map(
 									entry -> entry.getKey().getName() + "=" + entry.getValue()[index]).collect(
 										joining(", "));
