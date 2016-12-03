@@ -86,7 +86,7 @@ public abstract class JupiterTestDescriptor extends AbstractTestDescriptor
 				.flatMap(Arrays::stream)
 				.collect(toList());
 		// @formatter:on
-		return ExtensionRegistry.createRegistryFrom(existingExtensionRegistry, extensionTypes);
+		return ExtensionRegistry.createRegistryFromTypes(existingExtensionRegistry, extensionTypes);
 	}
 
 	/**

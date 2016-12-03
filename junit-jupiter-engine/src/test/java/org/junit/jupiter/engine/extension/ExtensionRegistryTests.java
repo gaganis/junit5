@@ -16,7 +16,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.engine.extension.ExtensionRegistry.createRegistryFrom;
+import static org.junit.jupiter.engine.extension.ExtensionRegistry.createRegistryFromTypes;
 import static org.junit.jupiter.engine.extension.ExtensionRegistry.createRegistryWithDefaultExtensions;
 
 import java.util.List;
@@ -83,12 +83,12 @@ public class ExtensionRegistryTests {
 		ExtensionRegistry parent = registry;
 		parent.registerExtension(MyExtension.class);
 
-		ExtensionRegistry child = createRegistryFrom(parent, singletonList(YourExtension.class));
+		ExtensionRegistry child = createRegistryFromTypes(parent, singletonList(YourExtension.class));
 		assertExtensionRegistered(child, MyExtension.class);
 		assertExtensionRegistered(child, YourExtension.class);
 		assertEquals(2, countExtensions(child, MyExtensionApi.class));
 
-		ExtensionRegistry grandChild = createRegistryFrom(child, emptyList());
+		ExtensionRegistry grandChild = createRegistryFromTypes(child, emptyList());
 		assertExtensionRegistered(grandChild, MyExtension.class);
 		assertExtensionRegistered(grandChild, YourExtension.class);
 		assertEquals(2, countExtensions(grandChild, MyExtensionApi.class));
@@ -100,12 +100,12 @@ public class ExtensionRegistryTests {
 		parent.registerExtension(MyExtension.class);
 		assertEquals(1, countExtensions(parent, MyExtensionApi.class));
 
-		ExtensionRegistry child = createRegistryFrom(parent, asList(MyExtension.class, YourExtension.class));
+		ExtensionRegistry child = createRegistryFromTypes(parent, asList(MyExtension.class, YourExtension.class));
 		assertExtensionRegistered(child, MyExtension.class);
 		assertExtensionRegistered(child, YourExtension.class);
 		assertEquals(2, countExtensions(child, MyExtensionApi.class));
 
-		ExtensionRegistry grandChild = createRegistryFrom(child, asList(MyExtension.class, YourExtension.class));
+		ExtensionRegistry grandChild = createRegistryFromTypes(child, asList(MyExtension.class, YourExtension.class));
 		assertExtensionRegistered(grandChild, MyExtension.class);
 		assertExtensionRegistered(grandChild, YourExtension.class);
 		assertEquals(2, countExtensions(grandChild, MyExtensionApi.class));

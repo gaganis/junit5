@@ -17,13 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ContainerExtensionContext;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestExtensionContext;
-import org.junit.jupiter.api.extension.TestInvocationContext;
 import org.junit.jupiter.api.extension.TestInvocationContextProvider;
+import org.junit.jupiter.api.extension.TestInvocationContextProvider.TestInvocationContext;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.jupiter.engine.execution.ConditionEvaluator;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
@@ -87,8 +83,8 @@ class MultiTestInvocationStrategy implements TestInvocationStrategy {
 		TestExtensionContext testExtensionContext = new TestInvocationExtensionContext(
 			parentContext.getExtensionContext(), parentContext.getExecutionListener(), testDescriptor, testInstance,
 			throwableCollector);
-		ExtensionRegistry registry = ExtensionRegistry.createRegistryFrom(parentContext.getExtensionRegistry(),
-			new InvocationContextParameterResolver(invocationContext));
+		ExtensionRegistry registry = ExtensionRegistry.createRegistryFromInstances(parentContext.getExtensionRegistry(),
+			invocationContext.getExtensions());
 		// @formatter:off
         return parentContext.extend()
                 .withExtensionRegistry(registry)
@@ -134,27 +130,6 @@ class MultiTestInvocationStrategy implements TestInvocationStrategy {
 		}
 		catch (Exception ex) {
 			throw ExceptionUtils.throwAsUncheckedException(ex);
-		}
-	}
-
-	private static class InvocationContextParameterResolver implements ParameterResolver {
-
-		private final TestInvocationContext invocationContext;
-
-		InvocationContextParameterResolver(TestInvocationContext invocationContext) {
-			this.invocationContext = invocationContext;
-		}
-
-		@Override
-		public boolean supports(ParameterContext parameterContext, ExtensionContext extensionContext)
-				throws ParameterResolutionException {
-			return invocationContext.hasValue(parameterContext.getParameter());
-		}
-
-		@Override
-		public Object resolve(ParameterContext parameterContext, ExtensionContext extensionContext)
-				throws ParameterResolutionException {
-			return invocationContext.getValue(parameterContext.getParameter());
 		}
 	}
 

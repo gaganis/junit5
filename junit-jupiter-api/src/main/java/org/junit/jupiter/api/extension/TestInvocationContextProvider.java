@@ -12,7 +12,10 @@ package org.junit.jupiter.api.extension;
 
 import static org.junit.platform.commons.meta.API.Usage.Experimental;
 
+import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.platform.commons.meta.API;
 
@@ -26,5 +29,17 @@ import org.junit.platform.commons.meta.API;
 public interface TestInvocationContextProvider extends Extension {
 
 	Iterator<TestInvocationContext> provideInvocation(ContainerExtensionContext extensionContext);
+
+	interface TestInvocationContext {
+
+		default String getDisplayName(ContainerExtensionContext extensionContext, int index) {
+			return MessageFormat.format("{0}[{1}]", extensionContext.getDisplayName(), index);
+		}
+
+		default List<Extension> getExtensions() {
+			return Collections.emptyList();
+		}
+
+	}
 
 }

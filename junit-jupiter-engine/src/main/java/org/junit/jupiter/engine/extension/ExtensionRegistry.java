@@ -69,7 +69,7 @@ public class ExtensionRegistry {
 	 * the new registry
 	 * @return a new {@code ExtensionRegistry}
 	 */
-	public static ExtensionRegistry createRegistryFrom(ExtensionRegistry parentRegistry,
+	public static ExtensionRegistry createRegistryFromTypes(ExtensionRegistry parentRegistry,
 			List<Class<? extends Extension>> extensionTypes) {
 
 		Preconditions.notNull(parentRegistry, "parentRegistry must not be null");
@@ -79,12 +79,13 @@ public class ExtensionRegistry {
 		return registry;
 	}
 
-	public static ExtensionRegistry createRegistryFrom(ExtensionRegistry parentRegistry, Extension... extensions) {
+	public static ExtensionRegistry createRegistryFromInstances(ExtensionRegistry parentRegistry,
+			List<? extends Extension> extensions) {
 
 		Preconditions.notNull(parentRegistry, "parentRegistry must not be null");
 
 		ExtensionRegistry registry = new ExtensionRegistry(parentRegistry);
-		Arrays.stream(extensions).forEach(registry::registerExtension);
+		extensions.forEach(registry::registerExtension);
 		return registry;
 	}
 

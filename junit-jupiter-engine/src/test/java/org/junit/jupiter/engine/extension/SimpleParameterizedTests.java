@@ -11,6 +11,7 @@
 package org.junit.jupiter.engine.extension;
 
 import static java.util.Collections.emptyIterator;
+import static java.util.Collections.singletonList;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 
@@ -20,6 +21,7 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,11 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.api.extension.ContainerExtensionContext;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.TestInvocationContext;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestInvocationContextProvider;
 import org.junit.platform.commons.JUnitException;
 
@@ -83,13 +89,20 @@ public class SimpleParameterizedTests {
 							}
 
 							@Override
-							public boolean hasValue(Parameter parameter) {
-								return values.containsKey(parameter);
-							}
+							public List<Extension> getExtensions() {
+								return singletonList(new ParameterResolver() {
+									@Override
+									public boolean supports(ParameterContext parameterContext,
+											ExtensionContext extensionContext) {
+										return values.containsKey(parameterContext.getParameter());
+									}
 
-							@Override
-							public Object getValue(Parameter parameter) {
-								return values.get(parameter)[index];
+									@Override
+									public Object resolve(ParameterContext parameterContext,
+											ExtensionContext extensionContext) throws ParameterResolutionException {
+										return values.get(parameterContext.getParameter())[index];
+									}
+								});
 							}
 						};
 					}
