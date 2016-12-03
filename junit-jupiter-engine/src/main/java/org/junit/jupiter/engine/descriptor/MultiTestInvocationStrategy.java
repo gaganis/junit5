@@ -41,11 +41,14 @@ class MultiTestInvocationStrategy implements TestInvocationStrategy {
 
 	private final AbstractTestDescriptor containerTestDescriptor;
 	private final SingleTestInvocationStrategy singleTestInvocationStrategy;
+	private final List<TestInvocationContextProvider> testInvocationContextProviders;
 
 	MultiTestInvocationStrategy(AbstractTestDescriptor testDescriptor,
-			ThrowingConsumer<JupiterEngineExecutionContext> testMethodCaller) {
+			ThrowingConsumer<JupiterEngineExecutionContext> testMethodCaller,
+			List<TestInvocationContextProvider> testInvocationContextProviders) {
 		this.containerTestDescriptor = testDescriptor;
 		this.singleTestInvocationStrategy = new SingleTestInvocationStrategy(testMethodCaller);
+		this.testInvocationContextProviders = testInvocationContextProviders;
 	}
 
 	@Override
@@ -57,11 +60,9 @@ class MultiTestInvocationStrategy implements TestInvocationStrategy {
 	@Override
 	public void execute(JupiterEngineExecutionContext context) {
 		AtomicInteger index = new AtomicInteger(0);
-		List<TestInvocationContextProvider> testInvocationContextProviders = context.getExtensionRegistry().getExtensions(
-			TestInvocationContextProvider.class);
 		// @formatter:off
         testInvocationContextProviders.stream()
-                .map(provider -> provider.provideInvocation((ContainerExtensionContext) context.getExtensionContext()))
+                .map(provider -> provider.provideInvocationContexts((ContainerExtensionContext) context.getExtensionContext()))
                 .forEach(iterator -> iterator.forEachRemaining(invocationContext -> {
                     processTestInvocation(context, invocationContext, index.getAndIncrement());
                 }));

@@ -28,7 +28,9 @@ import org.junit.platform.commons.meta.API;
 @API(Experimental)
 public interface TestInvocationContextProvider extends Extension {
 
-	Iterator<TestInvocationContext> provideInvocation(ContainerExtensionContext extensionContext);
+	boolean supports(ContainerExtensionContext extensionContext);
+
+	Iterator<TestInvocationContext> provideInvocationContexts(ContainerExtensionContext extensionContext);
 
 	interface TestInvocationContext {
 

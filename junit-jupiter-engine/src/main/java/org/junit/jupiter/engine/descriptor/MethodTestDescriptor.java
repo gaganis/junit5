@@ -10,12 +10,15 @@
 
 package org.junit.jupiter.engine.descriptor;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.platform.commons.meta.API.Usage.Internal;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExtensionContext;
 import org.junit.jupiter.api.extension.TestInvocationContextProvider;
 import org.junit.jupiter.engine.execution.ExecutableInvoker;
@@ -105,22 +108,31 @@ public class MethodTestDescriptor extends JupiterTestDescriptor {
 	public JupiterEngineExecutionContext prepare(JupiterEngineExecutionContext context) throws Exception {
 		ExtensionRegistry registry = populateNewExtensionRegistryFromExtendWith(this.testMethod,
 			context.getExtensionRegistry());
-		if (registry.getExtensions(TestInvocationContextProvider.class).isEmpty()) {
+		MethodBasedContainerExtensionContext containerExtensionContext = new MethodBasedContainerExtensionContext(
+			context.getExtensionContext(), context.getExecutionListener(), this);
+		// @formatter:off
+		List<TestInvocationContextProvider> testInvocationContextProviders = registry.stream(TestInvocationContextProvider.class)
+				.filter(provider -> provider.supports(containerExtensionContext))
+				.collect(toList());
+		// @formatter:on
+		if (testInvocationContextProviders.isEmpty()) {
 			return prepareForSingleInvocation(context, registry);
 		}
-		return prepareForMultipleInvocations(context, registry);
+		return prepareForMultipleInvocations(context, registry, containerExtensionContext,
+			testInvocationContextProviders);
+
 	}
 
 	private JupiterEngineExecutionContext prepareForSingleInvocation(JupiterEngineExecutionContext context,
 			ExtensionRegistry registry) throws Exception {
 		Object testInstance = context.getTestInstanceProvider().getTestInstance();
 		ThrowableCollector throwableCollector = new ThrowableCollector();
-		TestExtensionContext testExtensionContext = new MethodBasedTestExtensionContext(context.getExtensionContext(),
+		TestExtensionContext extensionContext = new MethodBasedTestExtensionContext(context.getExtensionContext(),
 			context.getExecutionListener(), this, testInstance, throwableCollector);
 		// @formatter:off
 		return context.extend()
                 .withExtensionRegistry(registry)
-                .withExtensionContext(testExtensionContext)
+                .withExtensionContext(extensionContext)
                 .withThrowableCollector(throwableCollector)
                 .withTestInvocationStrategy(new SingleTestInvocationStrategy(this::invokeTestMethod))
                 .build();
@@ -128,14 +140,15 @@ public class MethodTestDescriptor extends JupiterTestDescriptor {
 	}
 
 	private JupiterEngineExecutionContext prepareForMultipleInvocations(JupiterEngineExecutionContext context,
-			ExtensionRegistry registry) {
-		MethodBasedContainerExtensionContext containerExtensionContext = new MethodBasedContainerExtensionContext(
-			context.getExtensionContext(), context.getExecutionListener(), this);
+			ExtensionRegistry registry, ExtensionContext extensionContext,
+			List<TestInvocationContextProvider> testInvocationContextProviders) {
+		MultiTestInvocationStrategy testInvocationStrategy = new MultiTestInvocationStrategy(this,
+			this::invokeTestMethod, testInvocationContextProviders);
 		// @formatter:off
 		return context.extend()
 				.withExtensionRegistry(registry)
-				.withExtensionContext(containerExtensionContext)
-				.withTestInvocationStrategy(new MultiTestInvocationStrategy(this, this::invokeTestMethod))
+				.withExtensionContext(extensionContext)
+				.withTestInvocationStrategy(testInvocationStrategy)
 				.build();
 		// @formatter:on
 	}
