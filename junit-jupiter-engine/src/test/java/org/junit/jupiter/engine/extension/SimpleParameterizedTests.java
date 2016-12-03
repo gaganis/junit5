@@ -54,9 +54,9 @@ public class SimpleParameterizedTests {
 
 	static class SimpleParameterizedExtension implements TestInvocationContextProvider {
 		@Override
-		public boolean supports(ContainerExtensionContext extensionContext) {
+		public boolean supports(ContainerExtensionContext context) {
 			// @formatter:off
-			return extensionContext.getTestMethod()
+			return context.getTestMethod()
 					.map(Method::getParameters)
 					.filter(parameters -> Arrays.stream(parameters)
 							.anyMatch(parameter -> parameter.isAnnotationPresent(StringValues.class))
@@ -66,10 +66,9 @@ public class SimpleParameterizedTests {
 		}
 
 		@Override
-		public Iterator<TestInvocationContext> provide(ContainerExtensionContext extensionContext) {
+		public Iterator<TestInvocationContext> provide(ContainerExtensionContext context) {
 			Map<Parameter, String[]> values = new LinkedHashMap<>();
-			Parameter[] parameters = extensionContext.getTestMethod().orElseThrow(
-				IllegalStateException::new).getParameters();
+			Parameter[] parameters = context.getTestMethod().orElseThrow(IllegalStateException::new).getParameters();
 			for (Parameter parameter : parameters) {
 				if (parameter.isAnnotationPresent(StringValues.class)) {
 					StringValues annotation = parameter.getAnnotation(StringValues.class);
@@ -96,7 +95,7 @@ public class SimpleParameterizedTests {
 					int index = current++;
 					return new TestInvocationContext() {
 						@Override
-						public String getDisplayName(ContainerExtensionContext extensionContext, int index) {
+						public String getDisplayName(ContainerExtensionContext context, int index) {
 							return values.entrySet().stream().map(
 								entry -> entry.getKey().getName() + "=" + entry.getValue()[index]).collect(
 									joining(", "));
