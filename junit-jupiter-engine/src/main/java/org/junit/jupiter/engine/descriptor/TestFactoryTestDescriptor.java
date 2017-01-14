@@ -30,7 +30,6 @@ import org.junit.platform.commons.JUnitException;
 import org.junit.platform.commons.meta.API;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.hierarchical.SingleTestExecutor;
 
 /**
  * {@link TestDescriptor} for {@link org.junit.jupiter.api.TestFactory @TestFactory}
@@ -43,7 +42,6 @@ public class TestFactoryTestDescriptor extends MethodTestDescriptor {
 
 	public static final String DYNAMIC_TEST_SEGMENT_TYPE = "dynamic-test";
 
-	private static final SingleTestExecutor singleTestExecutor = new SingleTestExecutor();
 	private static final ExecutableInvoker executableInvoker = new ExecutableInvoker();
 
 	public TestFactoryTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method testMethod) {
