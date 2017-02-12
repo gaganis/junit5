@@ -117,7 +117,7 @@ public class DiscoveryTests extends AbstractJupiterTestEngineTests {
 	}
 
 	@Test
-	public void discoverTestTemplateMethodByMethodReference() {
+	public void discoverTestTemplateMethodByMethodSelector() {
 		LauncherDiscoveryRequest spec = request().selectors(
 			selectMethod(TestTemplateClass.class, "testTemplate")).build();
 
