@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import org.junit.platform.commons.meta.API;
 import org.junit.platform.commons.util.PackageUtils;
+import org.junit.platform.commons.util.Utilities;
 
 /**
  * A {@code TestEngine} facilitates <em>discovery</em> and <em>execution</em> of
@@ -175,4 +176,12 @@ public interface TestEngine {
 			PackageUtils.getAttribute(getClass(), Package::getImplementationVersion).orElse("DEVELOPMENT"));
 	}
 
+	/**
+	* Get the common platform utilities helper instance.
+	*
+	* @return {@link Utilities} instance
+	*/
+	default Utilities getUtilities() {
+		return Utilities.SINGLETON;
+	}
 }

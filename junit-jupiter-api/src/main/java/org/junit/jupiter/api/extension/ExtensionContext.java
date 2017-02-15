@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 import org.junit.platform.commons.meta.API;
 import org.junit.platform.commons.util.Preconditions;
+import org.junit.platform.commons.util.Utilities;
 
 /**
  * {@code ExtensionContext} encapsulates the <em>context</em> in which the
@@ -37,7 +38,7 @@ import org.junit.platform.commons.util.Preconditions;
  * @see Namespace
  */
 @API(Experimental)
-public interface ExtensionContext {
+public interface ExtensionContext extends Utilities {
 
 	/**
 	 * Get the parent extension context, if available.
