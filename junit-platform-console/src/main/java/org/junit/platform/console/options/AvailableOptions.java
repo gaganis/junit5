@@ -42,6 +42,7 @@ class AvailableOptions {
 	private final OptionSpec<Details> details;
 	private final OptionSpec<Theme> theme;
 	private final OptionSpec<Path> additionalClasspathEntries;
+	private final OptionSpec<Void> failIfNoTests;
 
 	// Reports
 	private final OptionSpec<Path> reportsDir;
@@ -202,6 +203,9 @@ class AvailableOptions {
 			"Provide the ID of an engine to be excluded from the test run. This option can be repeated.") //
 				.withRequiredArg();
 
+		failIfNoTests = parser.accepts("fail-if-no-tests",
+			"Fail(return error exit code) if no tests are found to be executed.");
+
 		// --- Configuration Parameters ----------------------------------------
 
 		configurationParameters = parser.accepts("config",
@@ -252,6 +256,8 @@ class AvailableOptions {
 		result.setExcludedTagExpressions(detectedOptions.valuesOf(this.excludeTag));
 		result.setIncludedEngines(detectedOptions.valuesOf(this.includeEngine));
 		result.setExcludedEngines(detectedOptions.valuesOf(this.excludeEngine));
+
+		result.setFailIfNoTests(detectedOptions.has(this.failIfNoTests));
 
 		// Configuration Parameters
 		result.setConfigurationParameters(toMap(detectedOptions.valuesOf(this.configurationParameters)));
