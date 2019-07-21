@@ -20,6 +20,7 @@ import static org.junit.jupiter.engine.config.JupiterConfiguration.DEFAULT_TEST_
 import static org.junit.jupiter.engine.config.JupiterConfiguration.DEFAULT_TEST_METHOD_TIMEOUT_PROPERTY_NAME;
 import static org.junit.jupiter.engine.config.JupiterConfiguration.DEFAULT_TEST_TEMPLATE_METHOD_TIMEOUT_PROPERTY_NAME;
 import static org.junit.jupiter.engine.config.JupiterConfiguration.DEFAULT_TIMEOUT_PROPERTY_NAME;
+import static org.junit.jupiter.engine.config.JupiterConfiguration.DEFAULT_TIMEOUT_MODE_PROPERTY_NAME;
 
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.timeout.TimeoutMode;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 
@@ -84,6 +86,11 @@ class TimeoutConfiguration {
 
 	private Optional<TimeoutDuration> getDefaultTimeout() {
 		return parseTimeoutDuration(DEFAULT_TIMEOUT_PROPERTY_NAME);
+	}
+
+	private TimeoutMode getDefaultTimeoutMode() {
+		Optional<String> configurationParameter = extensionContext.get
+		return timeoutModeConverter.get(extensionContext.getRoot().)
 	}
 
 	private Optional<TimeoutDuration> parseOrDefault(String propertyName,

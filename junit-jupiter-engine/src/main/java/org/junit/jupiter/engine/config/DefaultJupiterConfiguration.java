@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.timeout.TimeoutMode;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ConfigurationParameters;
 
@@ -39,6 +40,9 @@ public class DefaultJupiterConfiguration implements JupiterConfiguration {
 
 	private static final DisplayNameGeneratorParameterConverter displayNameGeneratorConverter = //
 		new DisplayNameGeneratorParameterConverter();
+
+	private static final EnumConfigurationParameterConverter<TimeoutMode> timeoutModeConverter = //
+			new EnumConfigurationParameterConverter<>(TimeoutMode.class, "timeout mode");
 
 	private final ConfigurationParameters configurationParameters;
 
@@ -91,5 +95,11 @@ public class DefaultJupiterConfiguration implements JupiterConfiguration {
 	public DisplayNameGenerator getDefaultDisplayNameGenerator() {
 		return displayNameGeneratorConverter.get(configurationParameters, DEFAULT_DISPLAY_NAME_GENERATOR_PROPERTY_NAME,
 			DisplayNameGenerator.Standard::new);
+	}
+
+	@Override
+	public TimeoutMode getTimeoutMode() {
+		return timeoutModeConverter.get(configurationParameters, DEFAULT_TIMEOUT_MODE_PROPERTY_NAME,
+				TimeoutMode.ENABLED);
 	}
 }

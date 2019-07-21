@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.timeout.TimeoutMode;
 
 /**
  * @since 5.4
@@ -36,6 +37,7 @@ public interface JupiterConfiguration {
 	String DEACTIVATE_ALL_CONDITIONS_PATTERN = ClassNamePatternParameterConverter.DEACTIVATE_ALL_PATTERN;
 	String DEFAULT_DISPLAY_NAME_GENERATOR_PROPERTY_NAME = "junit.jupiter.displayname.generator.default";
 
+	String DEFAULT_TIMEOUT_MODE_PROPERTY_NAME = "junit.jupiter.execution.timeout.mode";
 	String DEFAULT_TIMEOUT_PROPERTY_NAME = "junit.jupiter.execution.timeout.default";
 	String DEFAULT_TESTABLE_METHOD_TIMEOUT_PROPERTY_NAME = "junit.jupiter.execution.timeout.testable.method.default";
 	String DEFAULT_TEST_METHOD_TIMEOUT_PROPERTY_NAME = "junit.jupiter.execution.timeout.test.method.default";
@@ -62,5 +64,7 @@ public interface JupiterConfiguration {
 	Predicate<ExecutionCondition> getExecutionConditionFilter();
 
 	DisplayNameGenerator getDefaultDisplayNameGenerator();
+
+	TimeoutMode getTimeoutMode();
 
 }
